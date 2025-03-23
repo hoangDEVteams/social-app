@@ -1,0 +1,63 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f0f2f5;
+  }
+  .navbar {
+    background: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .navbar .logo {
+    font-size: 22px;
+    font-weight: bold;
+    color: #1877f2;
+  }
+  .navbar .nav-links a {
+    margin-left: 20px;
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+  }
+  .container {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 0 20px;
+  }
+  .welcome {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    text-align: center;
+  }
+  .welcome h2 {
+    margin-bottom: 10px;
+  }
+  .feature-links {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 30px;
+  }
+  .feature-links a {
+    background: white;
+    padding: 15px;
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    text-decoration: none;
+    font-size: 16px;
+    color: #333;
+    transition: 0.2s;
+  }
+  .feature-links a:hover {
+    background: #e7f0fe;
+    color: #1877f2;
+  }
