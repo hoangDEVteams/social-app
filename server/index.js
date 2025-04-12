@@ -1,26 +1,34 @@
 const express = require('express');
 const http = require('http');
 const path = require('path');
-const db = require('./sever');
+const db = require('./server');
 
 const app = express();
 const server = http.createServer(app);
 const initWebSocket = require('./socket');
 
 // Gửi giao diện tĩnh
-app.use(express.static(path.join(__dirname, '../pages')));
-app.use('/socket', express.static(path.join(__dirname, '../pages/public/socket')));
-app.use('/post', express.static(path.join(__dirname, '../pages/public/post')));
+app.use(express.static(path.join(__dirname, '../publice/pages')));
+app.use(express.static(path.join(__dirname, '../publice/img')));
+app.use('/socket', express.static(path.join(__dirname, '../publice/pages/socket')));
+app.use('/post', express.static(path.join(__dirname, '../publice/pages/post')));
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../pages/index.html'));
+  res.sendFile(path.join(__dirname, '../publice/pages/index.html'));
 });
 app.get('/socket', (req, res) => {
-  res.sendFile(path.join(__dirname, '../pages/public/socket/socket.html'));
+  res.sendFile(path.join(__dirname, '../publice/pages/socket/socket.html'));
 });
 app.get('/post', (req, res) => {
-  res.sendFile(path.join(__dirname, '../pages/public/post/post.html'));
+  res.sendFile(path.join(__dirname, '../publice/pages/post/post.html'));
 });
+
+app.post('/post', (req, res) => {
+  const { title, content } = req.body;
+  posts.push({ title, content });
+  res.redirect('/home');
+});
+
 initWebSocket(server);
 
 const PORT = process.env.PORT || 3000;
