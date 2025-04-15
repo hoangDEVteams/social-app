@@ -26,3 +26,4 @@ yarn.lock
 # MongoDB local database (nếu dùng dump)
 dump/
 package.json
+user.json

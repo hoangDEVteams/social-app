@@ -1,26 +1,22 @@
 const express = require('express');
 const http = require('http');
 const path = require('path');
-const mongoose = require('mongoose');
+const connectDB = require('./public/javascripts/mongodb'); 
+const userRoutes = require('./public/javascripts/user');
 
 const app = express();
 const server = http.createServer(app);
 
+// kết nối DB
+connectDB();
+
 // Gửi giao diện tĩnh
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public/pages')));
+app.use('/Users', userRoutes);
 
-// Cấu hình kết nối MongoDB
-const dbURI = 'mongodb://localhost:27017/SocialApp'; 
-mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => {
-    console.log('✅ Kết nối MongoDB thành công');
-  })
-  .catch((err) => {
-    console.log('❌ Lỗi kết nối MongoDB:', err);
-  });
-
-app.get('/', (req, res) => {
+app.get(['/', '/home' , '*'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public/pages/home.html'));
 });
 

@@ -64,3 +64,24 @@ body {
   .post {
      border: 1px solid #ccc; padding: 10px; margin: 10px 0; 
     }
+
+    h1 {
+      text-align: center;
+    }
+    
+    .container-friends-list{
+      padding: 20px;
+    }
+    #friendsTable {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ccc;
+    }
+    th {
+      background-color: #f5f5f5;
+    }

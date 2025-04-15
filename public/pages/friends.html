@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Danh sách bạn bè</title>
+  <link rel="stylesheet" href="/style.css">
+
+</head>
+<body>
+  <div class="navbar">
+    <div class="logo">SocialApp</div>
+    <div class="nav-links">
+      <a href="/home">Trang chủ</a>
+      <a href="/post">Thêm bạn bè</a>
+      <a href="/Users">Bạn bè</a>
+      <a href="/socket">Thông tin</a>
+    </div>
+  </div>
+
+  <h1>📋 Danh sách bạn bè</h1>
+
+  <div class="container-friends-list">
+    <table id="friendsTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Gender</th>
+          <th>Chi tiết</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    
+    <div id="pagination"></div>
+  </div>
+
+  <script>
+    let currentPage = 1;
+
+    function loadUsers(page = currentPage) {
+      fetch(`/Users/displayUser?page=${page}`)
+        .then(res => res.json())
+        .then(({ data, totalPages }) => {
+          const tbody = document.querySelector('#friendsTable tbody');
+          tbody.innerHTML = '';
+
+          data.forEach(user => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${user._id}</td>
+              <td>${user.username}</td>
+              <td>${user.email}</td>
+              <td>${user.gender === 0 ? "Nam" : "Nữ"}</td>
+              <td><button onclick="viewUser('${user._id}')">Chi tiết</button></td>
+            `;
+            tbody.appendChild(row);
+          });
+
+          renderPagination(totalPages);
+        })
+        .catch(err => console.error('❌ Lỗi khi tải dữ liệu:', err));
+    }
+
+    function renderPagination(totalPages) {
+      const container = document.getElementById('pagination');
+      container.innerHTML = '';
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        btn.onclick = () => {
+          currentPage = i;
+          loadUsers();
+        };
+        container.appendChild(btn);
+      }
+    }
+
+    function viewUser(id) {
+      fetch(`/Users/displayUser/${id}`)
+        .then(res => res.json())
+        .then(user => {
+          alert(`👤 ${user.name.first} ${user.name.last}\n📧 ${user.email}\n📞 ${user.profile.phone}`);
+        })
+        .catch(err => alert('Không thể tải chi tiết người dùng.'));
+    }
+
+    loadUsers();
+  </script>
+  
+</body>
+</html>
