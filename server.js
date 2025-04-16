@@ -13,11 +13,12 @@ connectDB();
 // Gửi giao diện tĩnh
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public/images')));
 app.use(express.static(path.join(__dirname, 'public/pages')));
 app.use('/Users', userRoutes);
 
 app.get(['/', '/home' , '*'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/pages/home.html'));
+  res.sendFile(path.join(__dirname, '/public/pages/home.html'));
 });
 
 

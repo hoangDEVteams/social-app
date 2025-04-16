@@ -4,9 +4,9 @@ const dbURI = 'mongodb://localhost:27017/SocialApp';
 const connectDB = async () => {
     try {
       await mongoose.connect(dbURI);
-      console.log('✅ Kết nối MongoDB thành công');
+      console.log('Kết nối MongoDB thành công');
     } catch (err) {
-      console.error('❌ Lỗi kết nối MongoDB:', err);
+      console.error('Lỗi kết nối MongoDB:', err);
     }
 };
 

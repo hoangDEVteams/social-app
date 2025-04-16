@@ -45,8 +45,8 @@
     <input type="number" id="ageMax" placeholder="Tối đa" style="width: 70px;">
   
     <!-- Tìm kiếm -->
-    <button onclick="applyFilters()">🔍 Tìm kiếm</button>
-    <button onclick="resetFilters()">🔄 Reset</button>
+    <button onclick="applyFilters()">Tìm kiếm</button>
+    <button onclick="resetFilters()">Reset</button>
   </div>
 
 
@@ -63,7 +63,6 @@
       </thead>
       <tbody></tbody>
     </table>
-    
     <div id="pagination"></div>
   </div>
   </div>
@@ -82,17 +81,20 @@
             const row = document.createElement('tr');
             row.innerHTML = `
               <td>${user._id}</td>
-              <td>${user.username}</td>
+              <td class="username">
+                <div> <img src="..${user.profile.picture}" alt="Lỗi"></div>
+                ${user.username}
+              </td>
               <td>${user.email}</td>
               <td>${user.gender === 0 ? "Nam" : "Nữ"}</td>
-              <td><button onclick="viewUser('${user._id}')">Chi tiết</button></td>
+              <td><a href="/Users/viewUser/${user._id}">Chi tiết</a></td>
             `;
             tbody.appendChild(row);
           });
 
           renderPagination(totalPages);
         })
-        .catch(err => console.error('❌ Lỗi khi tải dữ liệu:', err));
+        .catch(err => console.error('Lỗi khi tải dữ liệu:', err));
     }
 
     function renderPagination(totalPages) {
