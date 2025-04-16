@@ -42,15 +42,38 @@ router.get("/displayUser/:id", async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 });
-// Thêm user
-// router.post('/', async (req, res) => {
-//   const user = new User(req.body);
-//   try {
-//     const newUser = await user.save();
-//     res.status(201).json(newUser);
-//   } catch (err) {
-//     res.status(400).json({ message: err.message });
-//   }
-// });
 
+router.get('/api/users', async (req, res) => {
+    const {
+      username,
+      gender,
+      email,
+      ageMin,
+      ageMax,
+      page = 1,
+      limit = 10,
+    } = req.query;
+  
+    const filter = {};
+  
+    if (username) filter.username = { $regex: username, $options: 'i' };
+    if (email) filter.email = { $regex: email, $options: 'i' };
+    if (gender !== undefined && gender !== '') filter.gender = parseInt(gender);
+    if (ageMin || ageMax) {
+      filter.age = {};
+      if (ageMin) filter.age.$gte = parseInt(ageMin);
+      if (ageMax) filter.age.$lte = parseInt(ageMax);
+    }
+  
+    const skip = (page - 1) * limit;
+  
+    const [data, total] = await Promise.all([
+      User.find(filter).skip(skip).limit(limit),
+      User.countDocuments(filter)
+    ]);
+  
+    const totalPages = Math.ceil(total / limit);
+  
+    res.json({ data, totalPages });
+  });
 module.exports = router;

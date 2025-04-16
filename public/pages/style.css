@@ -68,7 +68,9 @@ body {
     h1 {
       text-align: center;
     }
-    
+    .container-friend{
+      padding: 30px;
+    }
     .container-friends-list{
       padding: 20px;
     }

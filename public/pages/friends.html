@@ -17,7 +17,38 @@
     </div>
   </div>
 
-  <h1>📋 Danh sách bạn bè</h1>
+  <div class="container-friend">
+    <h1>Danh sách bạn bè</h1>
+
+  <label for="searchInput">Tìm kiếm <input type="text" id="searchInput" placeholder="Tìm kiếm bạn bè..." onkeyup="searchUsers()"></label>
+  <br>
+  <div style="margin-bottom: 20px;">
+    <!-- Tìm kiếm theo danh mục (giới tính là ví dụ) -->
+    <label>Giới tính:</label>
+    <select id="gender">
+      <option value="">-- Tất cả --</option>
+      <option value="0">Nam</option>
+      <option value="1">Nữ</option>
+    </select>
+  
+    <!-- Gần đúng theo string -->
+    <label>Username:</label>
+    <input type="text" id="username" placeholder="Nhập username gần đúng">
+  
+    <label>Email:</label>
+    <input type="text" id="email" placeholder="Nhập email gần đúng">
+  
+    <!-- Trong khoảng số -->
+    <label>Tuổi từ:</label>
+    <input type="number" id="ageMin" placeholder="Tối thiểu" style="width: 70px;">
+    <label>đến</label>
+    <input type="number" id="ageMax" placeholder="Tối đa" style="width: 70px;">
+  
+    <!-- Tìm kiếm -->
+    <button onclick="applyFilters()">🔍 Tìm kiếm</button>
+    <button onclick="resetFilters()">🔄 Reset</button>
+  </div>
+
 
   <div class="container-friends-list">
     <table id="friendsTable">
@@ -34,6 +65,7 @@
     </table>
     
     <div id="pagination"></div>
+  </div>
   </div>
 
   <script>
@@ -81,9 +113,22 @@
       fetch(`/Users/displayUser/${id}`)
         .then(res => res.json())
         .then(user => {
-          alert(`👤 ${user.name.first} ${user.name.last}\n📧 ${user.email}\n📞 ${user.profile.phone}`);
+          alert(` ${user.name.first} ${user.name.last}\n${user.email}\n${user.profile.phone}`);
         })
         .catch(err => alert('Không thể tải chi tiết người dùng.'));
+    }
+
+    function searchUsers() {
+      const searchInput = document.getElementById('searchInput').value.toLowerCase();
+      const rows = document.querySelectorAll('#friendsTable tbody tr');
+      rows.forEach(row => {
+        const username = row.cells[1].textContent.toLowerCase();
+        if (username.includes(searchInput)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
     }
 
     loadUsers();
