@@ -1,7 +1,7 @@
 const { MongoClient } = require("mongodb");
-const url = "mongodb://localhost:27017";
-const dbName = "BaiTapGiuaKi";
-const collectionName = "NguoiDung";
+const url = "mongodb://localhost:27017/";
+const dbName = "SocialApp";
+const collectionName = "Users";
 
 const client = new MongoClient(url);
 

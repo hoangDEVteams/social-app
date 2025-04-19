@@ -218,74 +218,79 @@
   <script>
     // Get URL parameters
     function getUrlParam(param) {
-      // const urlParams = new URLSearchParams(window.location.search);
       const id = window.location.pathname.split("/").pop(); 
-      return urlParams.get(param);
+      return id;
     }
 
-    // Show alert message
-    function showAlert(message, type = 'success') {
-      const alertContainer = document.getElementById('alert-container');
-      alertContainer.innerHTML = `
-        <div class="alert ${type === 'danger' ? 'alert-danger' : 'alert-success'}">
-          ${message}
-          <button class="close-btn" onclick="this.parentElement.remove()">&times;</button>
+// Show alert message
+function showAlert(message, type = 'success') {
+  const alertContainer = document.getElementById('alert-container');
+  alertContainer.innerHTML = ` 
+    <div class="alert ${type === 'danger' ? 'alert-danger' : 'alert-success'}">
+      ${message}
+      <button class="close-btn" onclick="this.parentElement.remove()">&times;</button>
+    </div>
+  `;
+}
+
+// Format date
+function formatDate(dateString) {
+  if (!dateString) return 'N/A';
+  const date = new Date(dateString);
+  return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+}
+
+// Get user ID from URL
+const userId = getUrlParam('id');
+
+if (!userId) {
+  showAlert('User ID is missing. Redirecting to user list...', 'danger');
+  setTimeout(() => {
+    window.location.href = '/pages/home.html';
+  }, 2000);
+} else {
+  // Update links
+  document.getElementById('editLink').href = `/pages/edit-user.html?id=${userId}`;
+  document.getElementById('deleteLink').href = `/pages/delete-user.html?id=${userId}`;
+  
+  // Fetch user data
+  fetch(`/Users/viewUser/Detail/${userId}`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('User not found');
+      }
+      return response.json();
+    })
+    .then(user => {
+      // Combine first, middle, and last name
+      const fullName = `${user.name.first} ${user.name.middle} ${user.name.last}`;
+      
+      // Set profile picture and user details
+      document.getElementById('userProfilePic').src = user.profile.picture || "/images/default.png";
+      document.getElementById('userName').textContent = fullName;
+      document.getElementById('userEmail').textContent = user.email;
+      document.getElementById('userRole').textContent = user.auth ? 'User' : 'Unknown'; // Assuming 'auth' field for role
+      document.getElementById('userStatus').innerHTML = user.status.isActive ? 
+        '<span class="badge badge-success">Active</span>' : 
+        '<span class="badge badge-secondary">Inactive</span>';
+      document.getElementById('userCreated').textContent = formatDate(user.status.createdAt);
+      
+      // Hide loading, show profile
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('userProfile').style.display = 'block';
+      
+      document.title = `${fullName} - User Profile`;
+    })
+    .catch(error => {
+      console.error('Error fetching user:', error);
+      showAlert('User not found or error loading user data.', 'danger');
+      document.getElementById('loading').innerHTML = `
+        <div class="alert alert-danger">
+          User not found or error loading user data.
         </div>
       `;
-    }
-
-    // Format date
-    function formatDate(dateString) {
-      if (!dateString) return 'N/A';
-      const date = new Date(dateString);
-      return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-    }
-    
-    // Get user ID from URL
-    const userId = getUrlParam('id');
-    
-    if (!userId) {
-      showAlert('User ID is missing. Redirecting to user list...', 'danger');
-      setTimeout(() => {
-        window.location.href = '/pages/home.html';
-      }, 2000);
-    } else {
-      // Update links
-      document.getElementById('editLink').href = `/pages/edit-user.html?id=${userId}`;
-      document.getElementById('deleteLink').href = `/pages/delete-user.html?id=${userId}`;
-      
-      fetch(`/viewUser/Detail/${userId}`)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('User not found');
-          }
-          return response.json();
-        })
-        .then(user => {
-          document.getElementById('userProfilePic').src = user.picture || "/images/default.png";
-          document.getElementById('userName').textContent = user.name;
-          document.getElementById('userEmail').textContent = user.email;
-          document.getElementById('userRole').textContent = user.role;
-          document.getElementById('userStatus').innerHTML = user.active ? 
-            '<span class="badge badge-success">Active</span>' : 
-            '<span class="badge badge-secondary">Inactive</span>';
-          document.getElementById('userCreated').textContent = formatDate(user.createdAt);
-          
-          document.getElementById('loading').style.display = 'none';
-          document.getElementById('userProfile').style.display = 'block';
-          
-          document.title = `${user.name} - User Profile`;
-        })
-        .catch(error => {
-          console.error('Error fetching user:', error);
-          showAlert('User not found or error loading user data.', 'danger');
-          document.getElementById('loading').innerHTML = `
-            <div class="alert alert-danger">
-              User not found or error loading user data.
-            </div>
-          `;
-        });
-    }
+    });
+}
   </script>
 </body>
 </html>

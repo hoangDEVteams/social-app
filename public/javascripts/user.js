@@ -2,22 +2,22 @@
 const express = require("express");
 const path = require("path");
 const router = express.Router();
-const User = require("../DTO/DTOUser");
+const { connectDB } = require("./mongodb");
 
-// Lấy danh sách user
-router.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../pages/friends.html"));
-});
 
+// Lấy danh sách user (phân trang)
 router.get("/displayUser", async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = 10;
     const skip = (page - 1) * limit;
 
-    const users = await User.find().skip(skip).limit(limit);
+    // Kết nối tới MongoDB và lấy collection Users
+    const { collection } = await connectDB();
 
-    const total = await User.countDocuments();
+    // Truy vấn người dùng
+    const users = await collection.find().skip(skip).limit(limit).toArray();
+    const total = await collection.countDocuments();
 
     res.json({
       data: users,
@@ -26,22 +26,32 @@ router.get("/displayUser", async (req, res) => {
       totalPages: Math.ceil(total / limit),
     });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Lỗi lấy danh sách user:", err);
+    res.status(500).json({ message: "Lỗi server!" });
   }
+});
+// Lấy danh sách user
+router.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../pages/friends.html"));
 });
 
-//Xem chi tiết user
-router.get("/viewUser/:id", (req, res) => {
-  res.sendFile(path.join(__dirname, "../pages/view-user.html"));
-});
+// API lấy chi tiết user
 router.get("/viewUser/Detail/:id", async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ message: "Not found" });
+    const { collection } = await connectDB();
+    const userId = parseInt(req.params.id);
+    const user = await collection.findOne({ _id: userId });
+
+    if (!user) return res.status(404).json({ message: "Không tìm thấy người dùng" });
     res.json(user);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Lỗi khi xem chi tiết user:", err);
+    res.status(500).json({ message: "Lỗi server!" });
   }
+});
+// Giao diện chi tiết user
+router.get("/viewUser/:id", (req, res) => {
+  res.sendFile(path.join(__dirname, "../pages/view-user.html"));
 });
 
 module.exports = router;

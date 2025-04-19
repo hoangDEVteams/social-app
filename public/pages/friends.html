@@ -74,6 +74,7 @@
       fetch(`/Users/displayUser?page=${page}`)
         .then(res => res.json())
         .then(({ data, totalPages }) => {
+          console.log("Dữ liệu người dùng:", data); 
           const tbody = document.querySelector('#friendsTable tbody');
           tbody.innerHTML = '';
 

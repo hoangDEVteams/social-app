@@ -4,12 +4,14 @@ const bodyParser = require("body-parser");
 const fs = require("fs");
 const multer = require("multer");
 const http = require("http");
-const { getUsers, addUser, countUsersByCountry, deleteUser, connectDB } = require("./public/javascripts/mongodb");
+const { getUsers, addUser, countUsersByCountry, deleteUser, connectDB, client } = require("./public/javascripts/mongodb");
 
 const app = express();
 const server = http.createServer(app);
 const userRoutes = require('./public/javascripts/user');
 const PORT = 3000;
+
+connectDB();
 
 // ========== Cấu hình multer ==========
 const uploadDir = path.join(__dirname, "public", "images");
@@ -225,7 +227,7 @@ app.listen(PORT, () => {
 });
 
 process.on('SIGINT', async () => {
-  console.log("🛑 Đang đóng kết nối MongoDB...");
+  console.log("Đang đóng kết nối MongoDB...");
   await client.close();
   process.exit(0);
 });
