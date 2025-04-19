@@ -39,8 +39,10 @@ router.get("/", (req, res) => {
 router.get("/viewUser/Detail/:id", async (req, res) => {
   try {
     const { collection } = await connectDB();
-    const userId = parseInt(req.params.id);
-    const user = await collection.findOne({ _id: userId });
+    const userId = req.params.id; // Nhận userId từ URL (chuỗi)
+
+    // Tìm người dùng theo trường 'userId'
+    const user = await collection.findOne({ userId: userId });
 
     if (!user) return res.status(404).json({ message: "Không tìm thấy người dùng" });
     res.json(user);
