@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update User</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .preview-image {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <div class="row mb-4">
+            <div class="col">
+                <h1>Update User</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/pages/index.html">User List</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Update User</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        
+        <div id="alert-container"></div>
+
+        <div class="form-container">
+            <div id="loading" class="text-center py-5">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p>Loading user data...</p>
+            </div>
+
+            <form id="updateUserForm" enctype="multipart/form-data" style="display: none;">
+                <input type="hidden" id="userId" name="userId">
+                
+                <div class="profile-header">
+                    <img id="currentProfilePic" class="preview-image" src="" alt="Profile Picture">
+                    <h3 id="userFullName"></h3>
+                    <p class="text-muted" id="userUsername"></p>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Basic Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="username" class="form-label">Username*</label>
+                                <input type="text" class="form-control" id="username" name="username" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email*</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="firstName" class="form-label">First Name*</label>
+                                <input type="text" class="form-control" id="firstName" name="firstName" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="middleName" class="form-label">Middle Name</label>
+                                <input type="text" class="form-control" id="middleName" name="middleName">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="lastName" class="form-label">Last Name*</label>
+                                <input type="text" class="form-control" id="lastName" name="lastName" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="dob" class="form-label">Date of Birth*</label>
+                                <input type="date" class="form-control" id="dob" name="dob" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="gender" class="form-label">Gender*</label>
+                                <select class="form-select" id="gender" name="gender" required>
+                                    <option value="0">Male</option>
+                                    <option value="1">Female</option>
+                                    <option value="2">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Profile Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="country" class="form-label">Country*</label>
+                                <input type="text" class="form-control" id="country" name="country" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="city" class="form-label">City*</label>
+                                <input type="text" class="form-control" id="city" name="city" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Phone</label>
+                            <input type="text" class="form-control" id="phone" name="phone">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="bio" class="form-label">Bio</label>
+                            <textarea class="form-control" id="bio" name="bio" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="interests" class="form-label">Interests (comma-separated)</label>
+                            <input type="text" class="form-control" id="interests" name="interests">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="picture" class="form-label">Change Profile Picture</label>
+                            <input type="file" class="form-control" id="picture" name="picture" accept="image/*" onchange="previewImage(this)">
+                            <img id="imagePreview" src="#" alt="New Image Preview" class="preview-image" style="display: none; margin-top: 10px;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mb-4">
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='/pages/index.html'">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/pages/common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Get the user ID from the URL
+            const userId = getUrlParam('id');
+            
+            if (!userId) {
+                showAlert('User ID is missing. Redirecting to user list...', 'danger');
+                setTimeout(() => {
+                    window.location.href = '/pages/index.html';
+                }, 2000);
+                return;
+            }
+            
+            const user = await loadUserById(userId);
+            if (user) {
+                populateForm(user);
+            }
+            
+            document.getElementById('updateUserForm').addEventListener('submit', updateUser);
+        });
+
+        function populateForm(user) {
+            let profileImage = user.profile.picture;
+            if (profileImage && !profileImage.startsWith('http')) {
+                profileImage = profileImage; 
+            }
+            
+            document.getElementById('currentProfilePic').src = profileImage;
+            document.getElementById('userFullName').textContent = `${user.name.first} ${user.name.middle ? user.name.middle + ' ' : ''}${user.name.last}`;
+            document.getElementById('userUsername').textContent = `@${user.username}`;
+            
+            const dobDate = user.dob.split('T')[0];
+            
+            document.getElementById('userId').value = user._id;
+            document.getElementById('username').value = user.username;
+            document.getElementById('email').value = user.email;
+            document.getElementById('firstName').value = user.name.first;
+            document.getElementById('middleName').value = user.name.middle || '';
+            document.getElementById('lastName').value = user.name.last;
+            document.getElementById('dob').value = dobDate;
+            document.getElementById('gender').value = user.gender;
+            document.getElementById('country').value = user.profile.location.country;
+            document.getElementById('city').value = user.profile.location.city;
+            document.getElementById('phone').value = user.profile.phone || '';
+            document.getElementById('bio').value = user.profile.bio || '';
+            document.getElementById('interests').value = user.interests.join(', ');
+            
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('updateUserForm').style.display = 'block';
+        }
+
+        function previewImage(input) {
+            const preview = document.getElementById('imagePreview');
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+
+        function updateUser(e) {
+            e.preventDefault();
+            
+            const form = document.getElementById('updateUserForm');
+            const formData = new FormData(form);
+            const userId = document.getElementById('userId').value;
+            
+            fetch(`${API}/${userId}`, {
+                method: 'PUT',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Server responded with an error');
+                }
+                return response.json();
+            })
+            .then(data => {
+                navigateTo('/pages/index.html', { 
+                    success: encodeURIComponent('User updated successfully!') 
+                });
+            })
+            .catch(error => {
+                console.error('Error updating user:', error);
+                showAlert('Failed to update user. Please try again.', 'danger');
+            });
+        }
+    </script>
+</body>
+</html>
