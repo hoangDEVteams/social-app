@@ -74,12 +74,101 @@ app.get(['/', '/home'], (req, res) => {
   res.sendFile(path.join(__dirname, '/public/pages/home.html'));
 });
 
+
+app.put("/api/users/:userId", upload.single("profilePicture"), async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const {
+      username,
+      email,
+      firstname,
+      middlename,
+      lastname,
+      dob,
+      gender,
+      country,
+      city,
+      phonenumber,
+      bio
+    } = req.body;
+
+    const { collection } = await connectDB();
+    
+    // Check if user exists
+    const existingUser = await collection.findOne({ userId });
+    if (!existingUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Check for duplicate username or email (excluding current user)
+    const duplicateCheck = await collection.findOne({
+      $and: [
+        { userId: { $ne: userId } },
+        { $or: [{ username }, { email }, { "profile.phone": phonenumber }] }
+      ]
+    });
+
+    if (duplicateCheck) {
+      if (duplicateCheck.username === username) {
+        return res.status(409).json({ error: "Username already exists" });
+      }
+      if (duplicateCheck.email === email) {
+        return res.status(409).json({ error: "Email already in use" });
+      }
+      if (duplicateCheck.profile?.phone === phonenumber) {
+        return res.status(409).json({ error: "Phone number already in use" });
+      }
+    }
+
+    // Prepare update object
+    const updateData = {
+      $set: {
+        username,
+        email,
+        name: {
+          first: firstname,
+          middle: middlename,
+          last: lastname
+        },
+        dob,
+        gender: parseInt(gender),
+        "profile.bio": bio,
+        "profile.location.country": country,
+        "profile.location.city": city,
+        "profile.phone": phonenumber
+      }
+    };
+
+    // Update profile picture if provided
+    if (req.file) {
+      const picturePath = `/images/${req.file.filename}`;
+      updateData.$set["profile.picture"] = picturePath;
+    }
+
+    // Update user in database
+    const result = await collection.updateOne({ userId }, updateData);
+
+    if (result.modifiedCount === 0) {
+      return res.status(400).json({ error: "No changes made" });
+    }
+
+    res.status(200).json({ message: "User updated successfully" });
+  } catch (error) {
+    console.error("Error updating user:", error);
+    res.status(500).json({ error: "Failed to update user" });
+  }
+});
+
 app.get("/createuser", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "pages", "Create.html"));
 });
 
 app.get("/deleteuser", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "pages", "Delete.html"));
+});
+
+app.get("/editUser", (req, res) => {
+  res.sendFile(path.join(__dirname, "../pages/edit-user.html"));
 });
 
 app.get("/api/users", async (req, res) => {

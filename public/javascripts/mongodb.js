@@ -1,5 +1,5 @@
 const { MongoClient } = require("mongodb");
-const url = "mongodb://localhost:27017/";
+const url = "mongodb+srv://huan:an672005@cluster0.rjjsb.mongodb.net/SocialApp?retryWrites=true&w=majority&appName=Cluster0";
 const dbName = "SocialApp";
 const collectionName = "Users";
 

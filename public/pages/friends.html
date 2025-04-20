@@ -20,8 +20,7 @@
   <div class="container-friend">
     <h1>Danh sách bạn bè</h1>
 
-  <label for="searchInput">Tìm kiếm <input type="text" id="searchInput" placeholder="Tìm kiếm bạn bè..." onkeyup="searchUsers()"></label>
-  <br>
+    <label for="searchInput">Tìm kiếm <input type="text" id="searchInput" placeholder="Tìm kiếm bạn bè..." oninput="searchUsers()"></label>  <br>
   <div style="margin-bottom: 20px;">
     <!-- Tìm kiếm theo danh mục (giới tính là ví dụ) -->
     <label>Giới tính:</label>
@@ -59,6 +58,7 @@
           <th>Email</th>
           <th>Gender</th>
           <th>Chi tiết</th>
+          <th>Sửa</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -84,12 +84,15 @@
               <td><input type="checkbox"></td>
               <td>${user.userId}</td>
               <td class="username">
-                <div> <img src="..${user.profile.picture}" alt="Lỗi"></div>
+                <div> <img src="${user.profile.picture}" alt="Avatar"></div>
                 ${user.username}
               </td>
               <td>${user.email}</td>
               <td>${user.gender === 1 ? "Nam" : "Nữ"}</td>
-              <td><a href="/Users/viewUser/${user.userId}">Chi tiết</a></td>
+              <td>
+                <a href="/Users/viewUser/${user.userId}">Chi tiết</a>
+              </td>
+              <td><a href="/Users/editUser?id=${user.userId}">Sửa</a></td>
             `;
             tbody.appendChild(row);
           });
@@ -123,11 +126,35 @@
     }
 
     function searchUsers() {
-      const searchInput = document.getElementById('searchInput').value.toLowerCase();
+      const searchInput = document.getElementById('searchInput').value.toLowerCase().trim();
+      if (!searchInput) {
+        // If search is empty, show all rows
+        document.querySelectorAll('#friendsTable tbody tr').forEach(row => {
+          row.style.display = '';
+        });
+        return;
+      }
+      
       const rows = document.querySelectorAll('#friendsTable tbody tr');
       rows.forEach(row => {
-        const username = row.cells[1].textContent.toLowerCase();
-        if (username.includes(searchInput)) {
+        // Get text from all relevant cells
+        const userId = row.cells[1].textContent.toLowerCase();
+        
+        // For username, we need to be careful because it has nested elements
+        // We're getting just the text part, not the image alt text
+        const usernameText = row.cells[2].textContent.toLowerCase().trim();
+        
+        const email = row.cells[3].textContent.toLowerCase();
+        const gender = row.cells[4].textContent.toLowerCase();
+        
+        // Debug
+        console.log("Searching in:", {userId, usernameText, email, gender});
+        
+        // Check if any field contains the search input
+        if (userId.includes(searchInput) || 
+            usernameText.includes(searchInput) || 
+            email.includes(searchInput) || 
+            gender.includes(searchInput)) {
           row.style.display = '';
         } else {
           row.style.display = 'none';
