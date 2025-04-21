@@ -93,7 +93,7 @@ app.put("/api/users/:userId", upload.single("profilePicture"), async (req, res) 
     } = req.body;
 
     const { collection } = await connectDB();
-    
+
     // Check if user exists
     const existingUser = await collection.findOne({ userId });
     if (!existingUser) {

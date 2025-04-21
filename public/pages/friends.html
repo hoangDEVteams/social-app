@@ -1,72 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <title>Danh sách bạn bè</title>
-  <link rel="stylesheet" href="/style.css">
+  <title>Danh sách người dùng</title>
+  <link rel="stylesheet" href="../stylesheets/style.css">
 
 </head>
+
 <body>
   <div class="navbar">
-    <div class="logo">SocialApp</div>
+    <div class="logo">Vstagram</div>
     <div class="nav-links">
       <a href="/home">Trang chủ</a>
-      <a href="/post">Thêm bạn bè</a>
-      <a href="/Users">Bạn bè</a>
-      <a href="/socket">Thông tin</a>
+      <a href="/createuser">Tạo người dùng</a>
+      <a href="/deleteuser">Xóa người dùng</a>
     </div>
   </div>
 
   <div class="container-friend">
     <h1>Danh sách bạn bè</h1>
 
-    <label for="searchInput">Tìm kiếm <input type="text" id="searchInput" placeholder="Tìm kiếm bạn bè..." oninput="searchUsers()"></label>  <br>
-  <div style="margin-bottom: 20px;">
-    <!-- Tìm kiếm theo danh mục (giới tính là ví dụ) -->
-    <label>Giới tính:</label>
-    <select id="gender" onchange="applyFilters()">
-      <option value="">-- Tất cả --</option>
-      <option value="0">Nam</option>
-      <option value="1">Nữ</option>
-    </select>
-  
-    <!-- Gần đúng theo string -->
-    <label>Username:</label>
-    <input type="text" id="username" placeholder="Nhập username gần đúng">
-  
-    <label>Email:</label>
-    <input type="text" id="email" placeholder="Nhập email gần đúng">
-  
-    <!-- Trong khoảng số -->
-    <label>Tuổi từ:</label>
-    <input type="number" id="ageMin" placeholder="Tối thiểu" style="width: 70px;">
-    <label>đến</label>
-    <input type="number" id="ageMax" placeholder="Tối đa" style="width: 70px;">
-  
-    <!-- Tìm kiếm -->
-    <button onclick="">Tìm kiếm</button>
-    <button onclick="resetFilters()">Reset</button>
+    <label for="searchInput">Tìm kiếm <input type="text" id="searchInput" placeholder="Tìm kiếm bạn bè..."
+        oninput="searchUsers()"></label> <br>
+    <div style="margin-bottom: 20px;">
+      <!-- Tìm kiếm theo danh mục (giới tính là ví dụ) -->
+      <label>Giới tính:</label>
+      <select id="gender" onchange="applyFilters()">
+        <option value="">-- Tất cả --</option>
+        <option value="0">Nam</option>
+        <option value="1">Nữ</option>
+      </select>
+
+      <!-- Gần đúng theo string -->
+      <label>Username:</label>
+      <input type="text" id="username" placeholder="Nhập username gần đúng">
+
+      <label>Email:</label>
+      <input type="text" id="email" placeholder="Nhập email gần đúng">
+
+      <!-- Trong khoảng số -->
+      <label>Tuổi từ:</label>
+      <input type="number" id="ageMin" placeholder="Tối thiểu" style="width: 70px;">
+      <label>đến</label>
+      <input type="number" id="ageMax" placeholder="Tối đa" style="width: 70px;">
+
+      <!-- Tìm kiếm -->
+      <button onclick="">Tìm kiếm</button>
+      <button onclick="resetFilters()">Reset</button>
+    </div>
+
+    <div class="container-friends-list">
+      <table id="friendsTable">
+        <thead>
+          <tr>
+            <th></th>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Gender</th>
+            <th>Chi tiết</th>
+            <th>Sửa</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div id="pagination"></div>
+    </div>
   </div>
-  
-  <div class="container-friends-list">
-    <table id="friendsTable">
-      <thead>
-        <tr>
-          <th></th>
-          <th>ID</th>
-          <th>Username</th>
-          <th>Email</th>
-          <th>Gender</th>
-          <th>Chi tiết</th>
-          <th>Sửa</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-    <div id="pagination"></div>
-  </div>
-  </div>
-<img src="../images/2233445566778" alt="">
+  <img src="../images/2233445566778" alt="">
   <script>
     let currentPage = 1;
 
@@ -74,7 +76,7 @@
       fetch(`/Users/displayUser?page=${page}`)
         .then(res => res.json())
         .then(({ data, totalPages }) => {
-          console.log("Dữ liệu người dùng:", data); 
+          console.log("Dữ liệu người dùng:", data);
           const tbody = document.querySelector('#friendsTable tbody');
           tbody.innerHTML = '';
 
@@ -128,33 +130,27 @@
     function searchUsers() {
       const searchInput = document.getElementById('searchInput').value.toLowerCase().trim();
       if (!searchInput) {
-        // If search is empty, show all rows
         document.querySelectorAll('#friendsTable tbody tr').forEach(row => {
           row.style.display = '';
         });
         return;
       }
-      
+
       const rows = document.querySelectorAll('#friendsTable tbody tr');
       rows.forEach(row => {
-        // Get text from all relevant cells
         const userId = row.cells[1].textContent.toLowerCase();
-        
-        // For username, we need to be careful because it has nested elements
-        // We're getting just the text part, not the image alt text
+
         const usernameText = row.cells[2].textContent.toLowerCase().trim();
-        
+
         const email = row.cells[3].textContent.toLowerCase();
         const gender = row.cells[4].textContent.toLowerCase();
-        
-        // Debug
-        console.log("Searching in:", {userId, usernameText, email, gender});
-        
-        // Check if any field contains the search input
-        if (userId.includes(searchInput) || 
-            usernameText.includes(searchInput) || 
-            email.includes(searchInput) || 
-            gender.includes(searchInput)) {
+
+        console.log("Searching in:", { userId, usernameText, email, gender });
+
+        if (userId.includes(searchInput) ||
+          usernameText.includes(searchInput) ||
+          email.includes(searchInput) ||
+          gender.includes(searchInput)) {
           row.style.display = '';
         } else {
           row.style.display = 'none';
@@ -167,13 +163,12 @@
       const rows = document.querySelectorAll('#friendsTable tbody tr');
       const genderMap = {
         "0": "Nam",
-        "1": "Nữ"
+        "1": "Nữ",
       };
       rows.forEach(row => {
-        const genderText = row.cells[3].textContent.trim(); // Cột giới tính, ví dụ: "Nam" hoặc "NỮ"
+        const genderText = row.cells[3].textContent.trim();
 
-        // Nếu không chọn gì thì hiện hết, hoặc nếu khớp thì hiện
-        if (!genderlist ||  genderText === genderMap[genderlist]) {
+        if (!genderlist || genderText === genderMap[genderlist]) {
           row.style.display = '';
         } else {
           row.style.display = 'none';
@@ -183,6 +178,7 @@
 
     loadUsers();
   </script>
-  
+
 </body>
+
 </html>

@@ -1,83 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../stylesheets/navbar.css">
+    <link rel="stylesheet" href="../stylesheets/CreateUser.css">
     <title>Create User</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+</head>
 
-        form {
-            background-color: #fff;
-            padding: 20px 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 700px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
+<body>
 
-        h1 {
-            grid-column: span 2;
-            text-align: center;
-            color: #333;
-            margin-bottom: 10px;
-        }
+    <div class="navbar">
+        <div class="logo">Vstagram</div>
+        <div class="nav-links">
+            <a href="/home">Trang chủ</a>
+            <a href="/deleteuser">Xóa người dùng</a>
+            <a href="/Users">Danh sách người dùng</a>
+        </div>
+    </div>
+    </div>
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
+    <div class="form-container">
+        <form action="/api/create-user" method="POST">
+            <h1>Create User</h1>
 
-        label {
-            font-weight: bold;
-            color: #555;
-            margin-bottom: 5px;
-        }
+            <div class="form-group">
+                <label for="userId">User ID:</label>
+                <input type="text" id="userId" name="userId" readonly>
+            </div>
 
-        input, select, button {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-        }
+            <div class="form-group">
 
-        input:focus, select:focus, button:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
-        }
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
 
-        button {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-            padding: 10px;
-            grid-column: span 2;
-        }
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
 
-        button:hover {
-            background-color: #0056b3;
-        }
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
 
-        button:active {
-            background-color: #004085;
-        }
-    </style>
+            <div class="form-group">
+                <label for="firstname">First Name:</label>
+                <input type="text" id="firstname" name="firstname" required oninput="kTraKiTuChu(event)">
+            </div>
+
+            <div class="form-group">
+                <label for="middlename">Middle Name:</label>
+                <input type="text" id="middlename" name="middlename" required oninput="kTraKiTuChu(event)">
+            </div>
+
+            <div class="form-group">
+                <label for="lastname">Last Name:</label>
+                <input type="text" id="lastname" name="lastname" required oninput="kTraKiTuChu(event)">
+            </div>
+
+            <div class="form-group">
+                <label for="dob">Date of Birth:</label>
+                <input type="date" id="dob" name="dob" required>
+            </div>
+
+            <div class="form-group">
+                <label for="gender">Gender:</label>
+                <select id="gender" name="gender" required>
+                    <option value="0">Male</option>
+                    <option value="1">Female</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="country">Country:</label>
+                <select id="country" name="country" required onchange="onCountryChange()">
+                    <option value="Argentina">Argentina</option>
+                    <option value="Australia">Australia</option>
+                    <option value="Brazil">Brazil</option>
+                    <option value="Canada">Canada</option>
+                    <option value="China">China</option>
+                    <option value="France">France</option>
+                    <option value="Germany">Germany</option>
+                    <option value="India">India</option>
+                    <option value="Indonesia">Indonesia</option>
+                    <option value="Italy">Italy</option>
+                    <option value="Japan">Japan</option>
+                    <option value="Korea">Korea</option>
+                    <option value="Mexico">Mexico</option>
+                    <option value="Netherlands">Netherlands</option>
+                    <option value="Russia">Russia</option>
+                    <option value="Saudi Arabia">Saudi Arabia</option>
+                    <option value="South Africa">South Africa</option>
+                    <option value="Spain">Spain</option>
+                    <option value="United Kingdom">United Kingdom</option>
+                    <option value="United States">United States</option>
+                    <option value="Vietnam">Vietnam</option>
+                </select>
+
+            </div>
+
+            <div class="form-group">
+                <label for="city">City:</label>
+                <input type="text" id="city" name="city" required oninput="kTraKiTuChu(event)">
+            </div>
+
+            <div class="form-group">
+                <label for="phonenumber">Phone Number:</label>
+                <input type="tel" id="phonenumber" name="phonenumber" required oninput="kTraKiTuSo(event)">
+            </div>
+
+            <div class="form-group">
+                <label for="profilePicture">Profile Picture:</label>
+                <input type="file" id="profilePicture" name="profilePicture" accept="image/*">
+            </div>
+
+            <button type="submit">Create</button>
+        </form>
+    </div>
+
     <script>
         async function updateUserId() {
             const country = document.getElementById("country").value || "Vietnam";
@@ -89,11 +132,19 @@
                 alert("Không thể tạo UserID!");
             }
         }
-        
+
         window.onload = updateUserId;
-        
+
         function onCountryChange() {
             updateUserId();
+        }
+
+        function kTraKiTuSo(event) {
+            event.target.value = event.target.value.replace(/[^0-9]/g, '');
+        }
+
+        function kTraKiTuChu(event) {
+            event.target.value = event.target.value.replace(/[^A-Za-z\s]/g, '');
         }
 
         document.addEventListener("DOMContentLoaded", function () {
@@ -126,87 +177,6 @@
             });
         });
     </script>
-</head>
-<body>
-    <form action="/api/create-user" method="POST">
-        <h1>Create User</h1>
-
-        <div class="form-group">
-            <label for="userId">User ID:</label>
-            <input type="text" id="userId" name="userId" readonly>
-        </div>
-
-        <div class="form-group">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
-        </div>
-
-        <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-        </div>
-
-        <div class="form-group">
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-        </div>
-
-        <div class="form-group">
-            <label for="firstname">First Name:</label>
-            <input type="text" id="firstname" name="firstname" required>
-        </div>
-
-        <div class="form-group">
-            <label for="middlename">Middle Name:</label>
-            <input type="text" id="middlename" name="middlename">
-        </div>
-
-        <div class="form-group">
-            <label for="lastname">Last Name:</label>
-            <input type="text" id="lastname" name="lastname" required>
-        </div>
-
-        <div class="form-group">
-            <label for="dob">Date of Birth:</label>
-            <input type="date" id="dob" name="dob" required>
-        </div>
-
-        <div class="form-group">
-            <label for="gender">Gender:</label>
-            <select id="gender" name="gender" required>
-                <option value="0">Male</option>
-                <option value="1">Female</option>
-                <option value="2">Other</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="country">Country:</label>
-            <select id="country" name="country" required onchange="onCountryChange()">
-                <option value="Vietnam">Vietnam</option>
-                <option value="Germany">Germany</option>
-                <option value="United States">United States</option>
-                <option value="France">France</option>
-                <option value="Japan">Japan</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="city">City:</label>
-            <input type="text" id="city" name="city" required>
-        </div>
-
-        <div class="form-group">
-            <label for="phonenumber">Phone Number:</label>
-            <input type="tel" id="phonenumber" name="phonenumber" required>
-        </div>
-
-        <div class="form-group">
-            <label for="profilePicture">Profile Picture:</label>
-            <input type="file" id="profilePicture" name="profilePicture" accept="image/*">
-        </div>
-
-        <button type="submit">Create</button>
-    </form>
 </body>
+
 </html>
