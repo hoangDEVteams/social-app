@@ -24,22 +24,18 @@
     <label for="searchInput">Tìm kiếm <input type="text" id="searchInput" placeholder="Tìm kiếm bạn bè..."
         oninput="searchUsers()"></label> <br>
     <div style="margin-bottom: 20px;">
-      <!-- Tìm kiếm theo danh mục (giới tính là ví dụ) -->
       <label>Giới tính:</label>
       <select id="gender" onchange="applyAllFilters()">
         <option value="">-- Tất cả --</option>
         <option value="0">Nam</option>
         <option value="1">Nữ</option>
       </select>
-
-      <!-- Gần đúng theo string -->
       <label>Username:</label>
       <input type="text" id="username" placeholder="Nhập username gần đúng">
 
       <label>Email:</label>
       <input type="text" id="email" placeholder="Nhập email gần đúng">
 
-      <!-- Trong khoảng số -->
       <label>Tuổi từ:</label>
       <input type="number" id="ageMin" placeholder="Tối thiểu" style="width: 70px;">
       <label>đến</label>
@@ -175,8 +171,6 @@
         }
       });
     }
-
-    // Reset all filters and reload the data
     function resetFilters() {
       document.getElementById('searchInput').value = '';
       document.getElementById('gender').value = '';
@@ -186,8 +180,6 @@
       document.getElementById('ageMax').value = '';
       loadUsers();
     }
-
-    // Apply all filters when search button is clicked
     function applyAllFilters() {
       const searchInput = document.getElementById('searchInput').value.toLowerCase().trim();
       const gender = document.getElementById('gender').value;
@@ -202,12 +194,9 @@
         const userId = row.cells[1].textContent.toLowerCase();
         const usernameText = row.cells[2].textContent.toLowerCase().trim();
         const emailText = row.cells[3].textContent.toLowerCase();
-        const genderText = row.cells[4].textContent; // "Nam" or "Nữ"
+        const genderText = row.cells[4].textContent; 
         
-        // Check if row matches all the applied filters
         let display = true;
-        
-        // General search input filter
         if (searchInput && !(
           userId.includes(searchInput) ||
           usernameText.includes(searchInput) ||
@@ -217,25 +206,17 @@
           display = false;
         }
         
-        // Gender filter
         if (gender && genderText !== (gender === "0" ? "Nam" : "Nữ")) {
           display = false;
         }
         
-        // Username filter
         if (username && !usernameText.includes(username)) {
           display = false;
         }
         
-        // Email filter
         if (email && !emailText.includes(email)) {
           display = false;
         }
-        
-        // Apply age filters (would need to extract age from data if available)
-        // This is a placeholder since age doesn't appear to be in the current table
-        
-        // Apply visibility
         row.style.display = display ? '' : 'none';
       });
     }
