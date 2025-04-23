@@ -39,13 +39,28 @@ router.get("/editUser", (req, res) => {
   res.sendFile(path.join(__dirname, "../pages/edit-user.html"));
 });
 
+router.get("/displayUser/:id", async (req, res) => {
+  try {
+    const { collection } = await connectDB();
+    const userId = req.params.id;
+    const user = await collection.findOne({ userId: userId });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 // API lấy chi tiết user
 router.get("/viewUser/Detail/:id", async (req, res) => {
   try {
     const { collection } = await connectDB();
-    const userId = req.params.id; // Nhận userId từ URL (chuỗi)
+    const userId = req.params.id;
 
-    // Tìm người dùng theo trường 'userId'
     const user = await collection.findOne({ userId: userId });
 
     if (!user) return res.status(404).json({ message: "Không tìm thấy người dùng" });
@@ -55,7 +70,6 @@ router.get("/viewUser/Detail/:id", async (req, res) => {
     res.status(500).json({ message: "Lỗi server!" });
   }
 });
-// Giao diện chi tiết user
 router.get("/viewUser/:id", (req, res) => {
   res.sendFile(path.join(__dirname, "../pages/view-user.html"));
 });
