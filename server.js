@@ -25,6 +25,9 @@ const storage = multer.diskStorage({
   }
 });
 
+
+
+
 const upload = multer({ storage });
 
 // ========== Middleware ==========
@@ -74,6 +77,55 @@ app.get(['/', '/home'], (req, res) => {
   res.sendFile(path.join(__dirname, '/public/pages/home.html'));
 });
 
+app.get("/batch-edit", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "pages", "batch-edit.html"));
+});
+app.post("/api/users/batch-update", upload.single("profilePicture"), async (req, res) => {
+  try {
+    const { userIds } = req.body;
+    const userIdsArray = JSON.parse(userIds); 
+    
+    if (!userIdsArray || !Array.isArray(userIdsArray) || userIdsArray.length === 0) {
+      return res.status(400).json({ error: "Vui lòng chọn ít nhất một người dùng" });
+    }
+    
+    const { collection } = await connectDB();
+    
+    const updateData = {};
+    if (req.body.country) updateData["profile.location.country"] = req.body.country;
+    if (req.body.city) updateData["profile.location.city"] = req.body.city;
+    if (req.body.bio) updateData["profile.bio"] = req.body.bio;
+    if (req.body.interests) {
+      updateData["interests"] = req.body.interests.split(',').map(item => item.trim());
+    }
+    if (req.body.gender) {
+      updateData["gender"] = parseInt(req.body.gender);
+    }
+    
+    if (req.file) {
+      const picturePath = `/images/${req.file.filename}`;
+      updateData["profile.picture"] = picturePath;
+    }
+    
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ error: "Không có thông tin hợp lệ để cập nhật" });
+    }
+    
+    const result = await collection.updateMany(
+      { userId: { $in: userIdsArray } },
+      { $set: updateData }
+    );
+    
+    res.status(200).json({
+      message: `Đã cập nhật thành công ${result.modifiedCount} người dùng`,
+      modifiedCount: result.modifiedCount
+    });
+  } catch (error) {
+    console.error("Lỗi khi cập nhật nhiều người dùng:", error);
+    res.status(500).json({ error: "Không thể cập nhật người dùng" });
+  }
+});
+
 
 app.put("/api/users/:userId", upload.single("profilePicture"), async (req, res) => {
   try {
@@ -94,13 +146,10 @@ app.put("/api/users/:userId", upload.single("profilePicture"), async (req, res) 
 
     const { collection } = await connectDB();
 
-    // Check if user exists
     const existingUser = await collection.findOne({ userId });
     if (!existingUser) {
       return res.status(404).json({ error: "User not found" });
     }
-
-    // Check for duplicate username or email (excluding current user)
     const duplicateCheck = await collection.findOne({
       $and: [
         { userId: { $ne: userId } },
@@ -120,7 +169,6 @@ app.put("/api/users/:userId", upload.single("profilePicture"), async (req, res) 
       }
     }
 
-    // Prepare update object
     const updateData = {
       $set: {
         username,
@@ -138,14 +186,11 @@ app.put("/api/users/:userId", upload.single("profilePicture"), async (req, res) 
         "profile.phone": phonenumber
       }
     };
-
-    // Update profile picture if provided
     if (req.file) {
       const picturePath = `/images/${req.file.filename}`;
       updateData.$set["profile.picture"] = picturePath;
     }
 
-    // Update user in database
     const result = await collection.updateOne({ userId }, updateData);
 
     if (result.modifiedCount === 0) {
