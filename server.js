@@ -126,7 +126,6 @@ app.post("/api/users/batch-update", upload.single("profilePicture"), async (req,
   }
 });
 
-// Add this to your server.js or the appropriate router file
 app.get('/bulkdelete', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/pages/bulk-delete.html'));
 });
