@@ -39,24 +39,6 @@ router.get("/editUser", (req, res) => {
   res.sendFile(path.join(__dirname, "../pages/edit-user.html"));
 });
 
-// API to get a single user by userId
-router.get("/displayUser/:id", async (req, res) => {
-  try {
-    const { collection } = await connectDB();
-    const userId = req.params.id;
-    const user = await collection.findOne({ userId: userId });
-
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    res.json(user);
-  } catch (error) {
-    console.error("Error fetching user:", error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
 // API lấy chi tiết user
 router.get("/viewUser/Detail/:id", async (req, res) => {
   try {

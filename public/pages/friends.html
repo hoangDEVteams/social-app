@@ -64,7 +64,6 @@
       <div id="pagination"></div>
     </div>
   </div>
-  <img src="../images/2233445566778" alt="">
   <script>
     let currentPage = 1;
 
@@ -72,7 +71,6 @@
       fetch(`/Users/displayUser?page=${page}`)
         .then(res => res.json())
         .then(({ data, totalPages }) => {
-          console.log("Dữ liệu người dùng:", data);
           const tbody = document.querySelector('#friendsTable tbody');
           tbody.innerHTML = '';
 
@@ -156,15 +154,12 @@
 
     function applyFilters() {
       const genderlist = document.getElementById('gender').value;
+      console.log(genderlist);
       const rows = document.querySelectorAll('#friendsTable tbody tr');
-      const genderMap = {
-        "0": "Nam",
-        "1": "Nữ",
-      };
       rows.forEach(row => {
-        const genderText = row.cells[3].textContent.trim();
-
-        if (!genderlist || genderText === genderMap[genderlist]) {
+        const genderText = row.cells[4].textContent.trim();
+        const selectedGenderText = genderlist === "0" ? "Nam" : "Nữ";
+        if (!genderlist || genderText === selectedGenderText){
           row.style.display = '';
         } else {
           row.style.display = 'none';

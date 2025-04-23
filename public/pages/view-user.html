@@ -236,7 +236,7 @@
           <h5>User Information</h5>
         </div>
         <div class="card-body">
-          <p><strong>Role:</strong> <span id="userRole"></span></p>
+          <p><strong>social:</strong> <span id="social"></span></p>
           <p><strong>Status:</strong> <span id="userStatus"></span></p>
           <p><strong>Created:</strong> <span id="userCreated"></span></p>
         </div>
@@ -300,7 +300,11 @@
           document.getElementById('userProfilePic').src = user.profile.picture || "/images/default.png";
           document.getElementById('userName').textContent = fullName;
           document.getElementById('userEmail').textContent = user.email;
-          document.getElementById('userRole').textContent = user.auth ? 'User' : 'Unknown';
+          document.getElementById('social').innerHTML = `
+            <span class="social">Friends: ${checkEmty(user.social.friends)}</span><br>
+            <span class="social">Follower: ${user.social.followers}</span><br>
+            <span class="social">Following: ${user.social.following}</span><br>
+          `;
           document.getElementById('userStatus').innerHTML = user.status.isActive ?
             '<span class="badge badge-success">Active</span>' :
             '<span class="badge badge-secondary">Inactive</span>';
@@ -320,6 +324,14 @@
         </div>
       `;
         });
+    }
+
+    function checkEmty(object){
+      if (object === null || object === undefined || object === ""|| object.length === 0) {
+        return "0";
+      } else {
+        return object;
+      }
     }
   </script>
 </body>
