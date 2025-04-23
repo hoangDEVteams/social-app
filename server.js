@@ -38,7 +38,7 @@ app.use(express.static(path.join(__dirname, 'public/pages')));
 app.use('/Users', userRoutes);
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 app.use(bodyParser.json({ limit: '10mb' }));
-
+app.use('/', require('./public/javascripts/user'));
 app.use(express.static(path.join(__dirname, "public")));
 
 // ========== Tạo User ID ==========
@@ -126,6 +126,10 @@ app.post("/api/users/batch-update", upload.single("profilePicture"), async (req,
   }
 });
 
+// Add this to your server.js or the appropriate router file
+app.get('/bulkdelete', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/pages/bulk-delete.html'));
+});
 
 app.put("/api/users/:userId", upload.single("profilePicture"), async (req, res) => {
   try {

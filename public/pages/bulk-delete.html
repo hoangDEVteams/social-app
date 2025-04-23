@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xóa nhiều người dùng</title>
+    <link rel="stylesheet" href="../stylesheets/DeleteUser.css">
+    <style>
+        .user-list {
+            margin: 20px 0;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px;
+        }
+        
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .user-item:last-child {
+            border-bottom: none;
+        }
+        
+        .checkbox-container {
+            margin-right: 15px;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            gap: 10px;
+        }
+        .button {
+            color: black;
+        }
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background-color: #000000;
+            cursor: pointer;
+            border-radius: 4px;
+            width: auto;
+        }
+        
+        .pagination button.active {
+            background-color: #007bff;
+            color: rgb(255, 255, 255);
+            border-color: #007bff;
+        }
+        
+        .search-container {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        #selectAll {
+            margin-right: 10px;
+            width: auto;
+        }
+        
+        .user-checkbox {
+            width: auto !important;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .delete-button {
+            background-color: #dc3545;
+        }
+        
+        .delete-button:hover {
+            background-color: #c82333;
+        }
+        
+        .loading, .error, .no-results {
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .error {
+            color: #dc3545;
+        }
+        
+        .view-link {
+            color: #007bff;
+            text-decoration: none;
+            margin-left: 10px;
+        }
+        
+        .view-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">Vstagram</div>
+        <div class="nav-links">
+            <a href="/home">Trang chủ</a>
+            <a href="/createuser">Tạo người dùng</a>
+            <a href="/deleteuser">Xóa người dùng</a>
+            <a href="/Users">Danh sách người dùng</a>
+        </div>
+    </div>
+
+    <div class="form-container">
+        <h1>Xóa nhiều người dùng</h1>
+        
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Tìm kiếm theo ID, tên người dùng hoặc email...">
+            <button id="searchButton">Tìm kiếm</button>
+        </div>
+        
+        <div class="user-list">
+            <div class="user-item">
+                <input type="checkbox" id="selectAll" onclick="toggleAllCheckboxes()">
+                <label for="selectAll"><strong>Chọn tất cả</strong></label>
+            </div>
+            
+            <div id="userListContainer">
+                <div class="loading">Đang tải danh sách người dùng...</div>
+            </div>
+        </div>
+        
+        <div id="pagination" class="pagination">
+        </div>
+        
+        <div class="action-buttons">
+            <button onclick="window.location.href='/Users'" class="cancel-button">Quay lại</button>
+            <button id="deleteButton" class="delete-button" onclick="deleteSelectedUsers()">Xóa người dùng đã chọn</button>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        let totalPages = 1;
+        let users = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUsers();
+            
+            document.getElementById('searchButton').addEventListener('click', () => {
+                currentPage = 1;
+                loadUsers();
+            });
+            
+            document.getElementById('searchInput').addEventListener('keyup', (e) => {
+                if (e.key === 'Enter') {
+                    currentPage = 1;
+                    loadUsers();
+                }
+            });
+        });
+
+        async function loadUsers() {
+            try {
+                const searchTerm = document.getElementById('searchInput').value.trim();
+                const userListContainer = document.getElementById('userListContainer');
+                
+                userListContainer.innerHTML = '<div class="loading">Đang tải danh sách người dùng...</div>';
+                const response = await fetch(`/Users/displayUser?page=${currentPage}&search=${encodeURIComponent(searchTerm)}`);
+                
+                if (!response.ok) {
+                    throw new Error('Không thể tải danh sách người dùng');
+                }
+                
+                const data = await response.json();
+                users = data.data;
+                totalPages = data.totalPages;
+                
+                renderUsers();
+                renderPagination();
+            } catch (error) {
+                console.error('Lỗi khi tải danh sách người dùng:', error);
+                document.getElementById('userListContainer').innerHTML = 
+                    '<div class="error">Không thể tải danh sách người dùng. Vui lòng thử lại sau.<br>Chi tiết lỗi: ' + error.message + '</div>';
+            }
+        }
+
+        function renderUsers() {
+            const userListContainer = document.getElementById('userListContainer');
+            userListContainer.innerHTML = '';
+            
+            if (users.length === 0) {
+                userListContainer.innerHTML = '<div class="no-results">Không tìm thấy người dùng nào.</div>';
+                return;
+            }
+            
+            users.forEach(user => {
+                const userItem = document.createElement('div');
+                userItem.className = 'user-item';
+                
+                const firstName = user.name?.first || '';
+                const middleName = user.name?.middle || '';
+                const lastName = user.name?.last || '';
+                const fullName = [firstName, middleName, lastName].filter(Boolean).join(' ') || 'Không có tên';
+                
+                userItem.innerHTML = `
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="user-${user.userId}" value="${user.userId}" class="user-checkbox">
+                    </div>
+                    <div style="flex-grow: 1;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <div>
+                                <strong>${fullName}</strong>
+                                <small>(${user.userId})</small>
+                            </div>
+                            <div>
+                                <a href="/Users/viewUser/${user.userId}" class="view-link">Xem</a>
+                            </div>
+                        </div>
+                        <div>${user.email || user.username || 'Không có thông tin liên hệ'}</div>
+                    </div>
+                `;
+                
+                userListContainer.appendChild(userItem);
+            });
+        }
+        function renderPagination() {
+            const paginationContainer = document.getElementById('pagination');
+            paginationContainer.innerHTML = '';
+            
+            if (totalPages <= 1) return;
+            
+            if (currentPage > 1) {
+                const prevButton = document.createElement('button');
+                prevButton.textContent = 'Trước';
+                prevButton.onclick = () => {
+                    currentPage--;
+                    loadUsers();
+                };
+                paginationContainer.appendChild(prevButton);
+            }
+            
+            const maxPageButtons = 5;
+            const startPage = Math.max(1, Math.min(currentPage - Math.floor(maxPageButtons / 2), totalPages - maxPageButtons + 1));
+            const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+            
+            for (let i = startPage; i <= endPage; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.textContent = i;
+                if (i === currentPage) {
+                    pageButton.className = 'active';
+                }
+                pageButton.onclick = () => {
+                    currentPage = i;
+                    loadUsers();
+                };
+                paginationContainer.appendChild(pageButton);
+            }
+            
+            if (currentPage < totalPages) {
+                const nextButton = document.createElement('button');
+                nextButton.textContent = 'Tiếp';
+                nextButton.onclick = () => {
+                    currentPage++;
+                    loadUsers();
+                };
+                paginationContainer.appendChild(nextButton);
+            }
+        }
+        function toggleAllCheckboxes() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.user-checkbox');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+        }
+        async function deleteSelectedUsers() {
+            const selectedCheckboxes = document.querySelectorAll('.user-checkbox:checked');
+            const selectedUserIds = Array.from(selectedCheckboxes).map(checkbox => checkbox.value);
+            
+            if (selectedUserIds.length === 0) {
+                alert('Vui lòng chọn ít nhất một người dùng để xóa.');
+                return;
+            }
+            
+            const confirmDelete = confirm(`Bạn có chắc chắn muốn xóa ${selectedUserIds.length} người dùng đã chọn không? Hành động này không thể hoàn tác.`);
+            
+            if (!confirmDelete) return;
+            
+            try {
+                const response = await fetch('/api/delete-multiple-users', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userIds: selectedUserIds })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Lỗi máy chủ');
+                }
+                
+                const result = await response.json();
+                alert(result.message);
+                loadUsers(); 
+            } catch (error) {
+                console.error('Lỗi khi xóa người dùng:', error);
+                alert('Đã xảy ra lỗi khi xóa người dùng: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
